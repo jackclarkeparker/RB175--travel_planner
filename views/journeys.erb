@@ -1,0 +1,14 @@
+<h1>Welcome to Travel Planner</h1>
+
+<% if @journeys %>
+  <h2>Journeys</h2>
+  <ul>
+    <% @journeys.each do |journey| %>
+      <li><a><%= journey %></a></li>
+    <% end %>
+  </ul>
+  <a href="/create_journey">Create a new journey...</a>
+<% else %>
+  <p>It looks like you haven't got any journeys planned right now...</p>
+  <p>Would you like to <a href="/create_journey">create a new one?</a></p>
+<% end %>
