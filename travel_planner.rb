@@ -38,34 +38,42 @@ post "/create_journey" do
   @base_city = params[:base_city].strip
   inputs = { name: @journey_name, country: @base_country, city: @base_city }
 
-  if valid_journey?(inputs)
+  if invalid_journey?(inputs)
+    session["message"] = invalid_journey_message(inputs)
+    erb :create_journey
+  else
     File.write(File.join(journeys_path, "#{@journey_name}.yml"), Psych.dump(inputs))
     session["message"] = "Successfully created #{@journey_name}!"
     redirect "/"
-  else
-    session["message"] = invalid_journey_message(inputs)
-    erb :create_journey
   end
 end
 
-def valid_journey?(inputs)
-  return false if any_empty?(inputs) || name_taken?(inputs[:name])
-  true
+def invalid_journey?(inputs)
+  invalid_chars?(inputs[:name]) ||
+  name_taken?(inputs[:name]) ||
+  any_empty?(inputs)
 end
 
-def any_empty?(inputs)
-  inputs.any? { |_, input| input.empty? }
+def invalid_chars?(input_name)
+  !input_name.match?(/\A[a-z0-9_-]*\z/i)
 end
 
 def name_taken?(input_name)
   journey_names.any? { |journey_name| journey_name == input_name }
 end
 
+def any_empty?(inputs)
+  inputs.any? { |_, input| input.empty? }
+end
+
 def invalid_journey_message(inputs)
   case
-  when any_empty?(inputs)
-    "Please make sure an entry has been supplied in each field."
+  when invalid_chars?(inputs[:name])
+    "Journey name must be constructed with alphanumerics, hyphens," \
+    " and underscores only."
   when name_taken?(inputs[:name])
     "That name is already in use, please choose another."
+  when any_empty?(inputs)
+    "Please make sure an entry has been supplied in each field."
   end
 end
