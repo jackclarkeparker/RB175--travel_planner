@@ -11,10 +11,12 @@ configure do
   set :erb, :escape_html => true
 end
 
-ROOT = File.expand_path('..', __FILE__)
-
-def journeys_path
-  File.join(ROOT, 'data/journeys')
+def data_path
+  if ENV["RACK_ENV"] == 'test'
+    File.expand_path('../test/data', __FILE__)
+  else
+    File.expand_path('../data', __FILE__)
+  end
 end
 
 get "/" do
@@ -23,7 +25,7 @@ get "/" do
 end
 
 def journey_names
-  Dir.glob(File.join(journeys_path, '*')).map do |file|
+  Dir.glob(File.join(data_path, '*')).map do |file|
     File.basename(file, '.yml')
   end
 end
@@ -42,7 +44,7 @@ post "/create_journey" do
     session["message"] = invalid_journey_message(inputs)
     erb :create_journey
   else
-    File.write(File.join(journeys_path, "#{@journey_name}.yml"), Psych.dump(inputs))
+    File.write(File.join(data_path, "#{@journey_name}.yml"), Psych.dump(inputs))
     session["message"] = "Successfully created #{@journey_name}!"
     redirect "/"
   end
