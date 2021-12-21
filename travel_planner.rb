@@ -65,13 +65,13 @@ post "/create_journey" do
   end
 end
 
-def invalid_journey_name?(inputs) # Pass in params here instead?
-  invalid_journey_name?(inputs[:name]) ||
-  name_in_use?(inputs[:name]) ||
-  input.empty?
+def invalid_journey_name?(input_name) # Pass in params here instead?
+  invalid_name_chars?(input_name) ||
+  name_in_use?(input_name) ||
+  input_name.empty?
 end
 
-def invalid_journey_name?(input_name)
+def invalid_name_chars?(input_name)
   !input_name.match?(/\A[a-z0-9_-]*\z/i)
 end
 
@@ -81,7 +81,7 @@ end
 
 def message_for_invalid_journey_name(name)
   case
-  when invalid_journey_name?(name)
+  when invalid_name_chars?(name)
     "Journey name must be constructed with alphanumerics, hyphens," \
     " and underscores only."
   when name_in_use?(name)
@@ -97,7 +97,6 @@ get "/journeys/:journey" do
     redirect "/"
   else
     @journey = load_journey(params[:journey])
-    binding.pry
     erb :journey
   end
 end

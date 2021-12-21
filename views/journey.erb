@@ -7,8 +7,8 @@
 <% else %>
   <h2>Countries</h2>
   <ul>
-    <% @journey.countries.each do |country| %>
-      <li><a href="/journeys/<%= @journey.name %>/countries/<%= country %>"><%= country %></a></li>
+    <% @journey.countries.each_value do |country| %>
+      <li><a href="/journeys/<%= @journey.name %>/countries/<%= country.name %>"><%= country.name %></a></li>
     <% end %>
   </ul> 
 <% end %>

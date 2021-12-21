@@ -1,20 +1,3 @@
 --- !ruby/object:Journey
 name: to_vietnam
-countries:
-  New Zealand: !ruby/object:Country
-    name: New Zealand
-    locations:
-      Wellington: !ruby/object:Location
-        name: Wellington
-        temporable_details:
-          :arrival_date: 13-11-1864
-          :departure_date:
-        departure_ticket:
-        accomodation: []
-        activites: []
-        photos: []
-        details:
-        pros:
-        cons:
-    visa:
-    length_of_stay:
+countries: {}

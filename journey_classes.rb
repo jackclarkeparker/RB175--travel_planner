@@ -96,7 +96,7 @@ end
 class Country
   include Detailable
 
-  attr_reader :locations, :visa, :details, :pros, :cons
+  attr_reader :name, :locations, :visa, :details, :pros, :cons
 
   def initialize(name)
     @name = name
