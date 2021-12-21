@@ -1,0 +1,37 @@
+<h2>Adding a Country...</h2>
+<form action='/journeys/<%= @journey.name %>/add_country' method="post">
+  <% if @journey.countries.empty? %>
+    <div>    
+      <label for="country">Which country will you set out from?
+        <input name="country" value="<%= @country %>">
+      </label>
+    </div>
+    <div>
+      <label for="city">Which city will you set out from?
+        <input name="city" value="<%= @city %>">
+      </label>
+    </div>
+    <div>
+      <label for="arrival_date">What date will you set out? (dd-mm-yyyy)
+        <input name="arrival_date" value="<%= @arrival_date %>">
+      </label>
+    </div>
+  <% else %>
+    <div>    
+      <label for="country">Which country would you like to add to your journey?
+        <input name="country" value="<%= @country %>">
+      </label>
+    </div>
+    <div>
+      <label for="city">Which city will you arrive in?
+        <input name="city" value="<%= @city %>">
+      </label>
+    </div>
+    <div>
+      <label for="arrival_date">What date will you arrive? (dd-mm-yyyy)
+        <input name="arrival_date" value="<%= @arrival_date %>">
+      </label>
+    </div>
+  <% end %>
+  <button type="submit">Add country</button>
+</form>

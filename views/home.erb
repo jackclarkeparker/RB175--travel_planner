@@ -1,10 +1,10 @@
 <h1>Welcome to Travel Planner</h1>
 
-<% if @journeys %>
+<% if @journeys.size > 0 %>
   <h2>Journeys</h2>
   <ul>
     <% @journeys.each do |journey| %>
-      <li><a><%= journey %></a></li>
+      <li><a href="/journeys/<%= journey %>"><%= journey %></a></li>
     <% end %>
   </ul>
   <a href="/create_journey">Create a new journey...</a>
