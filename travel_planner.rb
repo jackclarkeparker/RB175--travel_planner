@@ -29,19 +29,18 @@ def data_path
   end
 end
 
-def journey_names
+def load_journeys
   Dir.glob(File.join(data_path, '*')).map do |file|
-    File.basename(file, '.yml')
+    YAML.load_file(file)
   end
 end
 
-# Load existing journeys from /data (or /data/journeys) upon opening 
-# session[:journeys] = Dir.glob(File.join(data_path, "*")).map do |journey|
-#   YAML.load_file(journey)
-# end
+def journey_names
+  load_journeys.map(&:name)
+end
 
 get "/" do
-  @journeys = journey_names
+  @journeys = load_journeys
   erb :home
 end
 
@@ -53,11 +52,12 @@ post "/create_journey" do
   @journey_name = params[:journey_name].strip
 
   if invalid_journey_name?(@journey_name)
+    status 422
     session[:message] = message_for_invalid_journey_name(@journey_name)
     erb :create_journey
   else
     journey = Journey.new(@journey_name)
-    journey_path = File.join(data_path, "#{@journey_name}.yml")
+    journey_path = File.join(data_path, "#{journey.camel_case_name}.yml")
     File.write(journey_path, Psych.dump(journey))
 
     session[:message] = "Successfully created #{@journey_name}!"
@@ -65,29 +65,31 @@ post "/create_journey" do
   end
 end
 
-def invalid_journey_name?(input_name) # Pass in params here instead?
+def invalid_journey_name?(input_name)
+  input_name.empty? ||
   invalid_name_chars?(input_name) ||
-  name_in_use?(input_name) ||
-  input_name.empty?
+  name_in_use?(input_name)
 end
 
 def invalid_name_chars?(input_name)
-  !input_name.match?(/\A[a-z0-9_-]*\z/i)
+  !input_name.match?(/\A[a-z0-9\ _-]+\z/i)
 end
 
 def name_in_use?(input_name)
-  journey_names.any? { |journey_name| journey_name == input_name }
+  journey_names.any? do |journey_name|
+    Journey.camel_casify(journey_name) == Journey.camel_casify(input_name)
+  end
 end
 
 def message_for_invalid_journey_name(name)
   case
-  when invalid_name_chars?(name)
-    "Journey name must be constructed with alphanumerics, hyphens," \
-    " and underscores only."
-  when name_in_use?(name)
-    "That name is already in use for another journey, please choose another."
   when name.empty?
     "A name for the journey must be supplied."
+  when invalid_name_chars?(name)
+    "Journey name must be constructed with alphanumerics, whitespace," \
+    " hyphens, and underscores only."
+  when name_in_use?(name)
+    "That name is already in use for another journey, please choose another."
   end
 end
 
@@ -102,7 +104,7 @@ get "/journeys/:journey" do
 end
 
 def load_journey(journey)
-  YAML.load_file(File.join(data_path, "#{params[:journey]}.yml"))
+  YAML.load_file(File.join(data_path, "#{journey}.yml"))
 end
 
 def nonexistent_journey?(journey)
@@ -123,6 +125,7 @@ post "/journeys/:journey/add_country" do
   @arrival_date = params[:arrival_date]
 
   if invalid_new_country?(params)
+    status 422
     session[:message] = message_for_invalid_new_country(params)
     erb :add_country
   else

@@ -77,15 +77,20 @@ end
 class Journey
   include Detailable
 
-  attr_reader :name, :countries, :details, :pros, :cons
+  attr_reader :name, :camel_case_name, :countries, :details, :pros, :cons
 
   def initialize(name)
     @name = name
+    @camel_case_name = self.class.camel_casify(name)
     @countries = {}
   end
 
   def add_country(country)
     countries[country] = Country.new(country)
+  end
+
+  def self.camel_casify(name)
+    name.downcase.gsub(' ', '_')
   end
 
   private
