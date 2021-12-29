@@ -90,7 +90,9 @@ class Journey
   end
 
   def add_country(country)
-    countries << Country.new(country, new_country_id)
+    c =  Country.new(country, new_country_id)
+    countries << c
+    c
   end
 
   def self.camel_casify(name)
@@ -100,20 +102,18 @@ class Journey
   private
 
   def new_journey_id
-    num = 1
+    id = 1
     loop do
-      return num if @@current_journeys.none? { |journey| journey.id == num }
-      num += 1
+      return id if @@current_journeys.none? { |j| j.id == id }
+      id += 1
     end
   end
 
   def new_country_id
-    num = 1
+    id = 1
     loop do
-      return num if countries.none? do |country|
-        country.id == num
-      end
-      num += 1
+      return id if countries.none? { |c| c.id == id }
+      id += 1
     end
   end
 
@@ -134,7 +134,9 @@ class Country
   end
 
   def add_location(name)
-    locations << Location.new(name)
+    l = Location.new(name, new_location_id)
+    locations << l
+    l
   end
 
   def length_of_stay
@@ -147,21 +149,30 @@ class Country
 
   private
 
+  def new_location_id
+    id = 1
+    loop do
+      return id if locations.none? { |l| l.id == id }
+      id += 1
+    end
+  end
+
   attr_writer :visa, :details, :pros, :cons
 end
 
 class Location
   include Temporable, Detailable
 
-  attr_reader :temporable_details, :departure_ticket # Could store these as a range
+  attr_reader :name, :id, :temporable_details, :departure_ticket # Could store these as a range
   attr_reader :activities, :accomodation, :photos
   attr_reader :details, :pros, :cons
 
-  def initialize(name)
+  def initialize(name, id)
     @name = name
+    @id = id
     @temporable_details = { arrival_date: nil, departure_date: nil }
     @departure_ticket = nil
-    @accomodation = []
+    @accomodations = []
     @activites = []
     @photos = []
     @details = nil
@@ -169,12 +180,16 @@ class Location
     @cons = nil
   end
 
-  def add_accomodation(acc) # Use hash with acc key instead?
-    accomodation << Accomodation.new(acc)
+  def set_arrival_date(date)
+    temporable_details[:arrival_date] = date
   end
 
-  def add_activity(a) # Use hash with acc key instead?
-    activities << Activity.new(act)
+  def add_accomodation(name) # Use hash with acc key instead?
+    accomodations << Accomodation.new(name, new_accomodation_id)
+  end
+
+  def add_activity(name) # Use hash with acc key instead?
+    activities << Activity.new(name, new_activity_id)
   end
 
   def set_departure_ticket
@@ -187,18 +202,35 @@ class Location
 
   private
 
+  def new_accomodation_id
+    id = 1
+    loop do
+      return id if accomodations.none? { |a| a.id == id }
+      id += 1
+    end
+  end
+
+  def new_activity_id
+    id = 1
+    loop do
+      return id if activities.none? { |a| a.id == id }
+      id += 1
+    end
+  end
+
   attr_writer :details, :pros, :cons, :departure_ticket
 end
 
 class Activity
   include Temporable, Addressable, Costable, Detailable
 
-  attr_reader :cost, :details, :pros, :cons
+  attr_reader :name, :id, :cost, :details, :pros, :cons
   attr_reader :temporable_details, :addressable_details
   attr_reader :to_bring
 
-  def initialize(name)
+  def initialize(name, id)
     @name = name
+    @id = id
     @cost = nil
     @pros = nil
     @cons = nil
@@ -227,11 +259,12 @@ end
 class Accomodation # Too ambiguous? Sometimes we'll stay in a temporary accomodation, othertimes we'll rent an apartment
   include Temporable, Addressable, Costable, Detailable
 
-  attr_reader :name, :cost, :details, :pros, :cons
+  attr_reader :name, :id, :cost, :details, :pros, :cons
   attr_reader :address, :temporable_details, :booking_service
 
-  def initialize(name)
+  def initialize(name, id)
     @name = name
+    @id = id
     @cost = nil
     @details = nil
     @pros = nil

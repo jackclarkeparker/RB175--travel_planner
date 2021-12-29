@@ -138,9 +138,9 @@ post "/journeys/:journey_id/add_country" do
 end
 
 def add_country(journey, country, location, arrival_date)
-  c = journey.add_country(country)
-  l = c.add_location(location)
-  l.set_arrival_date(arrival_date)
+  added_c = journey.add_country(country)
+  added_l = added_c.add_location(location)
+  added_l.set_arrival_date(arrival_date)
 end
 
 def invalid_new_country?(inputs)
@@ -172,7 +172,12 @@ end
 
 get "/journeys/:journey_id/countries/:country_id" do
   @journey = load_journey(params[:journey_id])
-  @country = @journey.countries.find { |country| country.id == params[:country_id] }
+  @country = load_country(@journey, params[:country_id])
 
   erb :country
+end
+
+def load_country(journey, country_id)
+  country_id = country_id.to_i
+  journey.countries.find { |c| c.id == country_id }
 end
