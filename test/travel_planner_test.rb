@@ -5,7 +5,7 @@ require 'rack/test'
 
 require 'fileutils'
 
-require_relative "../travel_planner.rb"
+require_relative "../travel_planner"
 
 class TravelPlannerTest < Minitest::Test
   include Rack::Test::Methods
@@ -20,6 +20,7 @@ class TravelPlannerTest < Minitest::Test
 
   def teardown
     FileUtils.rmtree(data_path)
+    Journey.class_variable_set(:@@current_journeys, [])
   end
 
   def create_journey(name)
@@ -31,11 +32,11 @@ class TravelPlannerTest < Minitest::Test
     File.write(File.join(data_path, "#{journey.camel_case_name}.yml"), Psych.dump(journey))
   end
 
-  def add_first_country(journey, country, location="Wellington", date="13-11-2012")
-    j = load_journey(journey)
-    add_initial_country(j, country, location, date)
-    save_journey(j)
-  end
+  # def add_first_country(journey, country, location="Wellington", date="13-11-2012")
+  #   j = load_journey(journey)
+  #   add_initial_country(j, country, location, date)
+  #   save_journey(j)
+  # end
 
   def session
     last_request.env["rack.session"]
@@ -54,7 +55,19 @@ class TravelPlannerTest < Minitest::Test
     get '/'
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<h2>Journeys</h2>"
-    assert_includes last_response.body, %q(<li><a href="/journeys/foo_vacation">Foo Vacation)
+    assert_includes last_response.body, %q(<li><a href="/journeys/1">Foo Vacation)
+  end
+
+  def test_id_increments_with_multiple_journeys
+    create_journey("Foo Vacation")
+    create_journey("Bar Vacation")
+    create_journey("Baz Vacation")
+
+    get "/"
+
+    assert_includes last_response.body, %q(<li><a href="/journeys/1">Foo Vacation)
+    assert_includes last_response.body, %q(<li><a href="/journeys/2">Bar Vacation)
+    assert_includes last_response.body, %q(<li><a href="/journeys/3">Baz Vacation)
   end
 
   def test_visit_create_journey_page
@@ -73,7 +86,7 @@ class TravelPlannerTest < Minitest::Test
 
     get last_response["Location"]
     assert_equal 200, last_response.status
-    assert_includes last_response.body, %q(<li><a href="/journeys/foo_vacation">Foo Vacation)
+    assert_includes last_response.body, %q(<li><a href="/journeys/1">Foo Vacation)
   end
 
   def test_create_journey_with_invalid_chars
@@ -107,12 +120,12 @@ class TravelPlannerTest < Minitest::Test
   def test_visit_journey_page_no_countries
     create_journey('Foo Vacation')
 
-    get '/journeys/foo_vacation'
+    get '/journeys/1'
 
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<p>It looks like you don't have any" \
                                         " countries planned for visiting in your journey yet.</p>"
-    assert_includes last_response.body, %q(<a href="/journeys/foo_vacation/add_country">add your starting country?)
+    assert_includes last_response.body, %q(<a href="/journeys/1/add_country">add your starting country?)
   end
 
   # COMMENTED OUT because the anchor's reference includes `New Zealand` in it's path. No point in

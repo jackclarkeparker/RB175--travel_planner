@@ -77,16 +77,20 @@ end
 class Journey
   include Detailable
 
-  attr_reader :name, :camel_case_name, :countries, :details, :pros, :cons
+  attr_reader :name, :camel_case_name, :id, :countries, :details, :pros, :cons
+
+  @@current_journeys = []
 
   def initialize(name)
     @name = name
     @camel_case_name = self.class.camel_casify(name)
-    @countries = {}
+    @id = new_journey_id
+    @countries = []
+    @@current_journeys << self
   end
 
   def add_country(country)
-    countries[country] = Country.new(country)
+    countries << Country.new(country, new_country_id)
   end
 
   def self.camel_casify(name)
@@ -95,23 +99,42 @@ class Journey
 
   private
 
+  def new_journey_id
+    num = 1
+    loop do
+      return num if @@current_journeys.none? { |journey| journey.id == num }
+      num += 1
+    end
+  end
+
+  def new_country_id
+    num = 1
+    loop do
+      return num if countries.none? do |country|
+        country.id == num
+      end
+      num += 1
+    end
+  end
+
   attr_writer :details, :pros, :cons
 end
 
 class Country
   include Detailable
 
-  attr_reader :name, :locations, :visa, :details, :pros, :cons
+  attr_reader :name, :id, :locations, :visa, :details, :pros, :cons
 
-  def initialize(name)
+  def initialize(name, id)
     @name = name
-    @locations = {}
+    @id = id
+    @locations = []
     @visa = nil
     @length_of_stay = nil
   end
 
   def add_location(name)
-    locations[name] = Location.new(name)
+    locations << Location.new(name)
   end
 
   def length_of_stay

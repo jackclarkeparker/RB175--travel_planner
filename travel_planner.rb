@@ -15,12 +15,6 @@ configure do
   set :erb, :escape_html => true
 end
 
-helpers do
-  def countries_visiting(journey)
-    journey[:starting_country] + journey[:locations]
-  end
-end
-
 def data_path
   if ENV["RACK_ENV"] == 'test'
     File.expand_path('../test/data', __FILE__)
@@ -35,6 +29,7 @@ def load_journeys
   end
 end
 
+# Move to a different location in the program? Where is it used?
 def journey_names
   load_journeys.map(&:name)
 end
@@ -57,12 +52,16 @@ post "/create_journey" do
     erb :create_journey
   else
     journey = Journey.new(@journey_name)
-    journey_path = File.join(data_path, "#{journey.camel_case_name}.yml")
-    File.write(journey_path, Psych.dump(journey))
+    save_journey(journey)
 
     session[:message] = "Successfully created #{@journey_name}!"
     redirect "/"
   end
+end
+
+def save_journey(journey)
+  journey_path = File.join(data_path, "#{journey.camel_case_name}.yml")
+  File.write(journey_path, Psych.dump(journey))
 end
 
 def invalid_journey_name?(input_name)
@@ -93,33 +92,35 @@ def message_for_invalid_journey_name(name)
   end
 end
 
-get "/journeys/:journey" do
-  if nonexistent_journey?(params[:journey])
+get "/journeys/:journey_id" do
+  if nonexistent_journey?(params[:journey_id])
     session[:message] = "That journey doesn't exist"
     redirect "/"
   else
-    @journey = load_journey(params[:journey])
+    @journey = load_journey(params[:journey_id])
     erb :journey
   end
 end
 
-def load_journey(journey)
-  YAML.load_file(File.join(data_path, "#{journey}.yml"))
+def load_journey(id)
+  id = id.to_i
+  load_journeys.find { |journey| journey.id == id }
 end
 
-def nonexistent_journey?(journey)
-  !name_in_use?(journey)
+def nonexistent_journey?(id)
+  id = id.to_i
+  load_journeys.none? { |journey| journey.id == id }
 end
 
-get "/journeys/:journey/add_country" do
-  @journey = load_journey(params[:journey])
+get "/journeys/:journey_id/add_country" do
+  @journey = load_journey(params[:journey_id])
   erb :add_country
 end
 
-post "/journeys/:journey/add_country" do
-  @journey = load_journey(params[:journey])
+post "/journeys/:journey_id/add_country" do
+  @journey = load_journey(params[:journey_id])
 
-  params.each { |_, v| v.strip! }
+  params.each_value(&:strip!)
   @country = params[:country]
   @city = params[:city]
   @arrival_date = params[:arrival_date]
@@ -129,21 +130,17 @@ post "/journeys/:journey/add_country" do
     session[:message] = message_for_invalid_new_country(params)
     erb :add_country
   else
-    add_initial_country(@journey, @country, @city, @arrival_date)
+    add_country(@journey, @country, @city, @arrival_date)
     save_journey(@journey)
 
-    redirect "/journeys/#{@journey.name}"
+    redirect "/journeys/#{params[:journey_id]}"
   end
 end
 
-def add_initial_country(journey, country, location, arrival_date)
+def add_country(journey, country, location, arrival_date)
   c = journey.add_country(country)
   l = c.add_location(location)
   l.set_arrival_date(arrival_date)
-end
-
-def save_journey(journey)
-  File.write(File.join(data_path, "#{journey.name}.yml"), Psych.dump(journey))
 end
 
 def invalid_new_country?(inputs)
@@ -171,4 +168,11 @@ def message_for_invalid_new_country(inputs)
   when invalid_date_format?(inputs[:arrival_date])
     "Invalid date: Please be sure to follow the specified format: <b>dd-mm-yyyy</b>"
   end
+end
+
+get "/journeys/:journey_id/countries/:country_id" do
+  @journey = load_journey(params[:journey_id])
+  @country = @journey.countries.find { |country| country.id == params[:country_id] }
+
+  erb :country
 end

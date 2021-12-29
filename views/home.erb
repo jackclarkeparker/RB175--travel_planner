@@ -4,7 +4,7 @@
   <h2>Journeys</h2>
   <ul>
     <% @journeys.each do |journey| %>
-      <li><a href="/journeys/<%= journey.camel_case_name %>"><%= journey.name %></a></li>
+      <li><a href="/journeys/<%= journey.id %>"><%= journey.name %></a></li>
     <% end %>
   </ul>
   <a href="/create_journey">Create a new journey...</a>

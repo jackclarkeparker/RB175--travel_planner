@@ -1,4 +1,23 @@
 --- !ruby/object:Journey
 name: To infinity and beyond
-countries: {}
 camel_case_name: to_infinity_and_beyond
+id: 1
+countries:
+  New Zealand: !ruby/object:Country
+    name: New Zealand
+    id: 1
+    locations:
+      Wellington: !ruby/object:Location
+        name: Wellington
+        temporable_details:
+          :arrival_date: 13-11-1864
+          :departure_date:
+        departure_ticket:
+        accomodation: []
+        activites: []
+        photos: []
+        details:
+        pros:
+        cons:
+    visa:
+    length_of_stay:

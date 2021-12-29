@@ -1,5 +1,5 @@
 <h2>Adding a Country...</h2>
-<form action='/journeys/<%= @journey.camel_case_name %>/add_country' method="post">
+<form action='/journeys/<%= @journey.id %>/add_country' method="post">
   <% if @journey.countries.empty? %>
     <div>    
       <label for="country">Which country will you set out from?
