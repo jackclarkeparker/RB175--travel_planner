@@ -13,47 +13,12 @@ countries:
       :arrival_date: 13-11-1864
       :departure_date:
     departure_ticket:
-    accomodation: []
-    activites: []
     photos: []
     details:
     pros:
     cons:
-  visa:
-  length_of_stay:
-- !ruby/object:Country
-  name: New Zealand
-  id: 2
-  locations:
-  - !ruby/object:Location
-    name: Wellington
-    temporable_details:
-      :arrival_date: 13-11-1864
-      :departure_date:
-    departure_ticket:
-    accomodation: []
-    activites: []
-    photos: []
-    details:
-    pros:
-    cons:
-  visa:
-  length_of_stay:
-- !ruby/object:Country
-  name: New Zealand
-  id: 3
-  locations:
-  - !ruby/object:Location
-    name: Wellington
-    temporable_details:
-      :arrival_date: 13-11-1864
-      :departure_date:
-    departure_ticket:
-    accomodation: []
-    activites: []
-    photos: []
-    details:
-    pros:
-    cons:
+    id: 1
+    accomodations: []
+    activities: []
   visa:
   length_of_stay:

@@ -177,7 +177,19 @@ get "/journeys/:journey_id/countries/:country_id" do
   erb :country
 end
 
-def load_country(journey, country_id)
-  country_id = country_id.to_i
-  journey.countries.find { |c| c.id == country_id }
+def load_country(journey, id)
+  id = id.to_i
+  journey.countries.find { |c| c.id == id }
+end
+
+get "/journeys/:journey_id/countries/:country_id/locations/:location_id" do
+  @journey = load_journey(params[:journey_id])
+  @country = load_country(@journey, params[:country_id])
+  @location = load_location(@country, params[:location_id])
+  erb :location
+end
+
+def load_location(country, id)
+  id = id.to_i
+  country.locations.find { |l| l.id == id}
 end

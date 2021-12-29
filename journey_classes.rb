@@ -164,7 +164,7 @@ class Location
   include Temporable, Detailable
 
   attr_reader :name, :id, :temporable_details, :departure_ticket # Could store these as a range
-  attr_reader :activities, :accomodation, :photos
+  attr_reader :activities, :accomodations, :photos
   attr_reader :details, :pros, :cons
 
   def initialize(name, id)
@@ -173,7 +173,7 @@ class Location
     @temporable_details = { arrival_date: nil, departure_date: nil }
     @departure_ticket = nil
     @accomodations = []
-    @activites = []
+    @activities = []
     @photos = []
     @details = nil
     @pros = nil
