@@ -15,6 +15,41 @@ configure do
   set :erb, :escape_html => true
 end
 
+helpers do
+  def navigation_breadcrumbs
+    route = request.path
+    return nil if route.length == 1
+
+    names = navigation_breadcrumb_names(route)
+    paths = navigation_breadcrumb_paths(route)
+
+    names.zip(paths)
+  end
+
+  def navigation_breadcrumb_paths(path)
+    path = path.clone
+    paths = []
+    paths << path.slice!(0)
+
+    while path.count('/') > 2
+      paths << paths.last + path.slice!(/\A.+?\d+/)
+    end
+
+    paths
+  end
+
+  def navigation_breadcrumb_names(route)
+    instances = []
+    ids = route.scan(/\d+/)[0..-2]
+
+    instances << journey = load_journey(ids.shift) unless ids.empty?
+    instances << country = load_country(journey, ids.shift) unless ids.empty?
+    instances << location = load_location(country, ids.shift) unless ids.empty?
+
+    instances.map(&:name).prepend("Home")
+  end
+end
+
 def data_path
   if ENV["RACK_ENV"] == 'test'
     File.expand_path('../test/data', __FILE__)
