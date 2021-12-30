@@ -1,7 +1,7 @@
 --- !ruby/object:Journey
 name: To infinity and beyond
 camel_case_name: to_infinity_and_beyond
-id: 1
+id: 2
 countries:
 - !ruby/object:Country
   name: New Zealand

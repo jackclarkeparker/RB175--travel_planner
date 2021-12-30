@@ -104,7 +104,7 @@ class Journey
   def new_journey_id
     id = 1
     loop do
-      return id if @@current_journeys.none? { |j| j.id == id }
+      return id if load_journeys.none? { |j| j.id == id }
       id += 1
     end
   end

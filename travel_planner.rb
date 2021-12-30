@@ -19,7 +19,7 @@ helpers do
   def navigation_breadcrumbs
     route = request.path
     return nil if route.length == 1
-    return [['Home', '/']] if route.match?(/\A\/[a-z]+\/\d+\z/)
+    # return [['Home', '/']] if route.match?(/\A\/[a-z]+\/\d+\z/)
 
     names = navigation_breadcrumb_names(route)
     paths = navigation_breadcrumb_paths(route)
@@ -42,9 +42,9 @@ helpers do
   def navigation_breadcrumb_paths(path)
     path = path.clone # Not necessary atm because I don't use `path` again.
     paths = []
+    paths << path.slice!(0)
 
-    while path.count('/') > 2
-      paths << path.slice!(0) if paths.empty?
+    while path.match? /\/.+\/\D/
       paths << paths.last + path.slice!(/\A.+?\d+/)
     end
 
@@ -163,7 +163,7 @@ post "/journeys/:journey_id/add_country" do
 
   params.each_value(&:strip!)
   @country = params[:country]
-  @city = params[:city]
+  @location = params[:location]
   @arrival_date = params[:arrival_date]
 
   if invalid_new_country?(params)
@@ -171,7 +171,7 @@ post "/journeys/:journey_id/add_country" do
     session[:message] = message_for_invalid_new_country(params)
     erb :add_country
   else
-    add_country(@journey, @country, @city, @arrival_date)
+    add_country(@journey, @country, @location, @arrival_date)
 
     session[:message] = "#{@journey.name} now includes travels through #{@country}!"
     redirect parent_route
@@ -241,25 +241,25 @@ post "/journeys/:journey_id/countries/:country_id/add_location" do
   @country = load_country(@journey, params[:country_id])
 
   params.each_value(&:strip!)
-  
-  @new_location = params[:location]
-  @new_arrival_date = params[:arrival_date]
+  # binding.pry
+  @location = params[:location]
+  @arrival_date = params[:arrival_date]
 
   if invalid_new_location?(params)
     status 422
     session[:message] = message_for_invalid_new_location(params)
     erb :add_location
   else
-    add_location(@journey, @country, @new_location, @new_arrival_date)
+    add_location(@journey, @country, @location, @arrival_date)
     
-    session[:message] = "Travels in #{@country.name} now include time spent in #{@new_location}!"
+    session[:message] = "Travels in #{@country.name} now include time spent in #{@location}!"
     redirect parent_route
   end
 end
 
-def add_location(journey, country, new_location, new_arrival_date)
-  added_l = country.add_location(new_location)
-  added_l.set_arrival_date(new_arrival_date)
+def add_location(journey, country, location, arrival_date)
+  added_l = country.add_location(location)
+  added_l.set_arrival_date(arrival_date)
 
   save_journey(journey)  
 end

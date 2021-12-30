@@ -7,22 +7,3 @@
   <% end %>
 </ul>
 <p><a href="/journeys/<%= @journey.id %>/countries/<%= @country.id %>/add_location">Add another location?</a></p>
-
-<% 
-=begin %>
-<% if @countries.empty? %>
-  <p>It looks like you don't have any countries planned for visiting in your journey yet.</p>
-  <p>Would you like to <a href="/journeys/<%= @journey.id %>/add_country">add your starting country?</a>
-  </p>
-<% else %>
-  <h2>Countries</h2>
-  <ul>
-    <% @journey.countries.each_value do |country| %>
-      <li><a href="/journeys/<%= @journey.id %>/countries/<%= country.id %>"><%= country.name %></a></li>
-    <% end %>
-  </ul> 
-  <p><a href="/journeys/<%= @journey.id %>/add_country">Add another country?</a></p>
-<% end %>
-
-<% 
-=end %>
