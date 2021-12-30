@@ -19,34 +19,36 @@ helpers do
   def navigation_breadcrumbs
     route = request.path
     return nil if route.length == 1
+    return [['Home', '/']] if route.match?(/\A\/[a-z]+\/\d+\z/)
 
     names = navigation_breadcrumb_names(route)
     paths = navigation_breadcrumb_paths(route)
-
+    
     names.zip(paths)
-  end
-
-  def navigation_breadcrumb_paths(path)
-    path = path.clone
-    paths = []
-    paths << path.slice!(0)
-
-    while path.count('/') > 2
-      paths << paths.last + path.slice!(/\A.+?\d+/)
-    end
-
-    paths
   end
 
   def navigation_breadcrumb_names(route)
     instances = []
-    ids = route.scan(/\d+/)[0..-2]
+    ids = route.scan(/\d+/)
+    ids = ids[0..-2] unless route.include?('add_')
 
     instances << journey = load_journey(ids.shift) unless ids.empty?
     instances << country = load_country(journey, ids.shift) unless ids.empty?
     instances << location = load_location(country, ids.shift) unless ids.empty?
 
     instances.map(&:name).prepend("Home")
+  end
+
+  def navigation_breadcrumb_paths(path)
+    path = path.clone # Not necessary atm because I don't use `path` again.
+    paths = []
+
+    while path.count('/') > 2
+      paths << path.slice!(0) if paths.empty?
+      paths << paths.last + path.slice!(/\A.+?\d+/)
+    end
+
+    paths
   end
 end
 
@@ -86,12 +88,16 @@ post "/create_journey" do
     session[:message] = message_for_invalid_journey_name(@journey_name)
     erb :create_journey
   else
-    journey = Journey.new(@journey_name)
-    save_journey(journey)
+    create_journey(@journey_name)
 
     session[:message] = "Successfully created #{@journey_name}!"
     redirect "/"
   end
+end
+
+def create_journey(journey_name)
+  journey = Journey.new(journey_name)
+  save_journey(journey)
 end
 
 def save_journey(journey)
@@ -166,9 +172,9 @@ post "/journeys/:journey_id/add_country" do
     erb :add_country
   else
     add_country(@journey, @country, @city, @arrival_date)
-    save_journey(@journey)
 
-    redirect "/journeys/#{params[:journey_id]}"
+    session[:message] = "#{@journey.name} now includes travels through #{@country}!"
+    redirect parent_route
   end
 end
 
@@ -176,6 +182,12 @@ def add_country(journey, country, location, arrival_date)
   added_c = journey.add_country(country)
   added_l = added_c.add_location(location)
   added_l.set_arrival_date(arrival_date)
+
+  save_journey(journey)
+end
+
+def parent_route
+  request.path[/\A.*(?=\/)/]
 end
 
 def invalid_new_country?(inputs)
@@ -215,6 +227,49 @@ end
 def load_country(journey, id)
   id = id.to_i
   journey.countries.find { |c| c.id == id }
+end
+
+get "/journeys/:journey_id/countries/:country_id/add_location" do
+  @journey = load_journey(params[:journey_id])
+  @country = load_country(@journey, params[:country_id])
+  
+  erb :add_location
+end
+
+post "/journeys/:journey_id/countries/:country_id/add_location" do
+  @journey = load_journey(params[:journey_id])
+  @country = load_country(@journey, params[:country_id])
+
+  params.each_value(&:strip!)
+  
+  @new_location = params[:location]
+  @new_arrival_date = params[:arrival_date]
+
+  if invalid_new_location?(params)
+    status 422
+    session[:message] = message_for_invalid_new_location(params)
+    erb :add_location
+  else
+    add_location(@journey, @country, @new_location, @new_arrival_date)
+    
+    session[:message] = "Travels in #{@country.name} now include time spent in #{@new_location}!"
+    redirect parent_route
+  end
+end
+
+def add_location(journey, country, new_location, new_arrival_date)
+  added_l = country.add_location(new_location)
+  added_l.set_arrival_date(new_arrival_date)
+
+  save_journey(journey)  
+end
+
+def invalid_new_location?(inputs)
+  invalid_new_country?(inputs)
+end
+
+def message_for_invalid_new_location(inputs)
+  message_for_invalid_new_country(inputs)
 end
 
 get "/journeys/:journey_id/countries/:country_id/locations/:location_id" do

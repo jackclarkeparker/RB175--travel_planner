@@ -7,7 +7,7 @@
   <% end %>
 </ul>
 
-<h2>Activites</h2>
+<h2>Activities</h2>
 <ul>
   <% @location.activities.each do |activity| %>
     <li><a href="/journeys/<%= @journey.id %>/countries/<%= @country.id %>/locations/<%= location.id %>/activities/<%= activity.id %>"><%= activity.name %></a></li>

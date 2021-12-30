@@ -8,11 +8,11 @@
     <p class="message"><%== session.delete(:message) %></p>
   <% end %>
   <% if navigation_breadcrumbs %>
-    <h3>... 
+    <h6>... 
       <% navigation_breadcrumbs.each do |name, path| %>
         <a href="<%= path %>"><%= name %></a> ...
       <% end %>
-    </h3>
+    </h6>
   <% end %>
 
   <%== yield %>

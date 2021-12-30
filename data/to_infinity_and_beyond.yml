@@ -9,16 +9,16 @@ countries:
   locations:
   - !ruby/object:Location
     name: Wellington
+    id: 1
     temporable_details:
       :arrival_date: 13-11-1864
       :departure_date:
     departure_ticket:
+    accomodations: []
+    activities: []
     photos: []
     details:
     pros:
     cons:
-    id: 1
-    accomodations: []
-    activities: []
   visa:
   length_of_stay:

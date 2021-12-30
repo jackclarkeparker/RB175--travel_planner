@@ -1,0 +1,14 @@
+<h2>Adding a Location...</h2>
+<form action='/journeys/<%= @journey.id %>/countries/<%= @country.id %>/add_location' method="post">
+  <div>    
+    <label for="location">Where else would you like to visit during your time in <%= @country.name %>?
+      <input name="location" value="<%= @location %>">
+    </label>
+  </div>
+  <div>
+    <label for="arrival_date">What date will you arrive there? (dd-mm-yyyy)
+      <input name="arrival_date" value="<%= @arrival_date %>">
+    </label>
+  </div>
+  <button type="submit">Add location</button>
+</form>

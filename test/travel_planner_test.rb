@@ -23,20 +23,11 @@ class TravelPlannerTest < Minitest::Test
     Journey.class_variable_set(:@@current_journeys, [])
   end
 
-  def create_journey(name)
-    journey = Journey.new(name)
+  def add_country_for_tests(journey_name, country_name, location_name, arrival_date)
+    journey = load_journeys.find { |journey| journey.name == journey_name }
+    add_country(journey, country_name, location_name, arrival_date)
     save_journey(journey)
   end
-
-  def save_journey(journey)
-    File.write(File.join(data_path, "#{journey.camel_case_name}.yml"), Psych.dump(journey))
-  end
-
-  # def add_first_country(journey, country, location="Wellington", date="13-11-2012")
-  #   j = load_journey(journey)
-  #   add_initial_country(j, country, location, date)
-  #   save_journey(j)
-  # end
 
   def session
     last_request.env["rack.session"]
@@ -124,25 +115,91 @@ class TravelPlannerTest < Minitest::Test
 
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<p>It looks like you don't have any" \
-                                        " countries planned for visiting in your journey yet.</p>"
+                                        " countries planned for a visit on this journey yet.</p>"
     assert_includes last_response.body, %q(<a href="/journeys/1/add_country">add your starting country?)
   end
 
-  # COMMENTED OUT because the anchor's reference includes `New Zealand` in it's path. No point in
-  # converting countries to camelcase only to have that feature replaced by indices
+  def test_visit_journey_page_with_countries
+    create_journey('Foo Vacation')
+    add_country_for_tests('Foo Vacation', 'New Zealand', 'Wellington', '13-11-1864')
 
-  # def test_visit_journey_page_with_countries
-  #   create_journey('Foo Vacation')
-  #   add_first_country('foo_vacation', 'New Zealand')
+    get '/journeys/1'
 
-  #   get '/journeys/foo_vacation'
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<h2>Countries</h2>"
+    assert_includes last_response.body, %q(<a href="/journeys/1/countries/1">New Zealand)
+  end
 
-  #   assert_equal 200, last_response.status
-  #   assert_includes last_response.body, "<h2>Countries</h2>"
-  #   assert_includes last_response.body, %q(<a href="/journeys/foo_vacation/countries/New Zealand">New Zealand)
-  # end
+  def test_id_increments_with_multiple_countries
+    create_journey('Foo Vacation')
+    add_country_for_tests('Foo Vacation', 'New Zealand', 'Wellington', '13-11-1864')
+    add_country_for_tests('Foo Vacation', 'Australia', 'Sydney', '14-11-1864')
+    add_country_for_tests('Foo Vacation', 'Vietnam', 'Da Nang', '15-11-1864')
 
-  # def test_visit_non_existent_journey_page
+    get "/journeys/1"
 
-  # end
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<h2>Countries</h2>"
+    assert_includes last_response.body, %q(<a href="/journeys/1/countries/1">New Zealand)
+    assert_includes last_response.body, %q(<a href="/journeys/1/countries/2">Australia)
+    assert_includes last_response.body, %q(<a href="/journeys/1/countries/3">Vietnam)
+  end
+
+  def test_visit_non_existent_journey_page
+    get '/journeys/1'
+
+    assert_equal 302, last_response.status
+    assert_equal session[:message], "That journey doesn't exist"
+    
+    get last_response["Location"]
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<p>It looks like you haven't got any journeys planned right now..."
+  end
+
+  def test_visit_add_country_page_first_time
+    create_journey('Foo Vacation')
+
+    get "/journeys/1/add_country"
+
+
+  end
+
+  def test_visit_add_country_page_subsequent_times
+
+  end
+
+  def test_add_country
+
+  end
+
+  def test_add_country_with_empty_input
+
+  end
+
+  def test_add_country_invalid_date_format
+
+  end
+
+  def test_visit_country_page
+
+  end
+
+  def test_visit_add_location_page
+
+  end
+
+  def test_add_location
+
+  end
+
+  def test_add_location_with_empty_input
+
+  end
+
+  def test_add_location_invalid_date_format
+
+  end
+
+  def test_
 end
