@@ -217,6 +217,23 @@ def message_for_invalid_new_country(inputs)
   end
 end
 
+get "/journeys/:journey_id/add_details" do
+  @journey = load_journey(params[:journey_id])
+  @topic_of_detail = @journey
+  erb :add_details
+end
+
+post "/journeys/:journey_id/add_details" do
+  journey = load_journey(params[:journey_id])
+  journey.set_details(params[:details])
+  journey.set_pros(params[:pros])
+  journey.set_cons(params[:cons])
+
+  save_journey(journey)
+
+  redirect parent_route
+end
+
 get "/journeys/:journey_id/countries/:country_id" do
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])

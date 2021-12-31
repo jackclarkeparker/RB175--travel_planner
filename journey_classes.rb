@@ -79,14 +79,14 @@ class Journey
 
   attr_reader :name, :camel_case_name, :id, :countries, :details, :pros, :cons
 
-  @@current_journeys = []
-
   def initialize(name)
     @name = name
     @camel_case_name = self.class.camel_casify(name)
     @id = new_journey_id
     @countries = []
-    @@current_journeys << self
+    @details = nil
+    @pros = nil
+    @cons = nil
   end
 
   def add_country(country)

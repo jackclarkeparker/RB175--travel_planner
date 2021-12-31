@@ -1,7 +1,7 @@
 --- !ruby/object:Journey
 name: To infinity and beyond
 camel_case_name: to_infinity_and_beyond
-id: 2
+id: 1
 countries:
 - !ruby/object:Country
   name: New Zealand
@@ -11,7 +11,7 @@ countries:
     name: Wellington
     id: 1
     temporable_details:
-      :arrival_date: 13-11-1864
+      :arrival_date: 13-11-2022
       :departure_date:
     departure_ticket:
     accomodations: []
@@ -22,3 +22,6 @@ countries:
     cons:
   visa:
   length_of_stay:
+details: Merry Go Round. Write Code. Get into the world.
+pros: It's great to go to Infinity.
+cons: There is nothing beyond infinity. What's with this conceptualization.?
