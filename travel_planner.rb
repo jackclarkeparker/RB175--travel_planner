@@ -139,7 +139,7 @@ get "/journeys/:journey_id" do
     redirect "/"
   else
     @journey = load_journey(params[:journey_id])
-    erb :journey
+    render_page_with_details(@journey, :journey)
   end
 end
 
@@ -151,6 +151,13 @@ end
 def nonexistent_journey?(id)
   id = id.to_i
   load_journeys.none? { |journey| journey.id == id }
+end
+
+def render_page_with_details(subject, template)
+  @subject = subject
+  erb :details_layout, :layout => :layout do
+    erb template
+  end
 end
 
 get "/journeys/:journey_id/add_country" do
@@ -219,7 +226,7 @@ end
 
 get "/journeys/:journey_id/add_details" do
   @journey = load_journey(params[:journey_id])
-  @topic_of_detail = @journey
+  @subject = @journey
   erb :add_details
 end
 

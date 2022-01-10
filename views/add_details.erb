@@ -1,12 +1,12 @@
-<h1>Information Concerning <%= @topic_of_detail.name %>...</h1>
+<h1>Information Concerning <%= @subject.name %>...</h1>
 <h5>(Information may be provided in Markdown format)</h5>
 <form action="/journeys/<%= params[:journey_id] %>/add_details" method='post'>
   <h2>Details</h2>
-  <textarea name="details" rows="12" cols="80"><%= @topic_of_detail.details %></textarea>
+  <textarea name="details" rows="12" cols="80"><%= @subject.details %></textarea>
   <h2>Pros</h2>
-  <textarea name="pros" rows="12" cols="80"><%= @topic_of_detail.pros %></textarea>
+  <textarea name="pros" rows="12" cols="80"><%= @subject.pros %></textarea>
   <h2>Cons</h2>
-  <textarea name="cons" rows="12" cols="80"><%= @topic_of_detail.cons %></textarea>
+  <textarea name="cons" rows="12" cols="80"><%= @subject.cons %></textarea>
   <button type="submit">Save Changes</button>
 </form>
 

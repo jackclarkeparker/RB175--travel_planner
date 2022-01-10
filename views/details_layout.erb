@@ -1,0 +1,14 @@
+<%== yield %>
+<% if @subject.details && @subject.details.size > 0 %>
+  <h2>Details</h2>
+  <p><%== @subject.rendered_details %>
+<% end %>
+<% if @subject.pros && @subject.pros.size > 0 %>
+  <h2>Pros</h2>
+  <p><%== @subject.rendered_pros %></p>
+<% end %>
+<% if @subject.cons && @subject.cons.size > 0 %>
+  <h2>Cons</h2>
+  <p><%== @subject.rendered_cons %></p>
+<% end %>
+<p><a href="<%= @subject.id %>/add_details">Add details</a></p>
