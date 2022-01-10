@@ -66,9 +66,38 @@ def load_journeys
   end
 end
 
-# Move to a different location in the program? Where is it used?
-def journey_names
-  load_journeys.map(&:name)
+def invalid_route_guard(params)
+  invalid_journey_guard(params)
+  invalid_country_guard(params) if params[:country_id]
+  invalid_location_guard(params) if params[:location_id]
+end
+
+def invalid_journey_guard(params)
+  id = params[:journey_id].to_i
+  if load_journeys.none? { |journey| journey.id == id }
+    session[:message] = "The journey specified doesn't exist."
+    redirect "/"
+  end
+end
+
+def invalid_country_guard(params)
+  journey = load_journey(params[:journey_id])
+  id = params[:country_id].to_i
+  if journey.countries.none? { |country| country.id == id }
+    session[:message] = "The country specified doesn't exist."
+    redirect "/journeys/#{journey.id}"
+  end
+end
+
+def invalid_location_guard(params)
+  journey = load_journey(params[:journey_id])
+  country = load_country(journey, params[:country_id])
+
+  id = params[:location_id].to_i
+  if country.locations.none? { |location| location.id == id }
+    session[:message] = "The location specified doesn't exist."
+    redirect "/journeys/#{journey.id}/countries/#{country.id}"
+  end
 end
 
 get "/" do
@@ -111,6 +140,10 @@ def name_in_use?(input_name)
   end
 end
 
+def journey_names
+  load_journeys.map(&:name)
+end
+
 def message_for_invalid_journey_name(name)
   case
   when name.empty?
@@ -134,17 +167,10 @@ def save_journey(journey)
 end
 
 get "/journeys/:journey_id" do
-  invalid_journey_guard(params)
+  invalid_route_guard(params)
+
   @journey = load_journey(params[:journey_id])
   render_page_with_details(@journey, :journey)
-end
-
-def invalid_journey_guard(params)
-  id = params[:journey_id].to_i
-  if load_journeys.none? { |journey| journey.id == id }
-    session[:message] = "The journey specified doesn't exist."
-    redirect "/"
-  end
 end
 
 def load_journey(id)
@@ -160,7 +186,8 @@ def render_page_with_details(subject, template)
 end
 
 get "/journeys/:journey_id/add_country" do
-  invalid_journey_guard(params)
+  invalid_route_guard(params)
+
   @journey = load_journey(params[:journey_id])
   erb :add_country
 end
@@ -244,22 +271,12 @@ post "/journeys/:journey_id/add_details" do
 end
 
 get "/journeys/:journey_id/countries/:country_id" do
-  invalid_journey_guard(params)
-  invalid_country_guard(params)
+  invalid_route_guard(params)
 
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])
 
   erb :country
-end
-
-def invalid_country_guard(params)
-  journey = load_journey(params[:journey_id])
-  id = params[:country_id].to_i
-  if journey.countries.none? { |country| country.id == id }
-    session[:message] = "The country specified doesn't exist."
-    redirect "/journeys/#{journey.id}"
-  end
 end
 
 def load_country(journey, id)
@@ -268,8 +285,7 @@ def load_country(journey, id)
 end
 
 get "/journeys/:journey_id/countries/:country_id/add_location" do
-  invalid_journey_guard(params)
-  invalid_country_guard(params)
+  invalid_route_guard(params)
 
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])
@@ -313,25 +329,12 @@ def message_for_invalid_new_location(inputs)
 end
 
 get "/journeys/:journey_id/countries/:country_id/locations/:location_id" do
-  invalid_journey_guard(params)
-  invalid_country_guard(params)
-  invalid_location_guard(params)
+  invalid_route_guard(params)
 
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])
   @location = load_location(@country, params[:location_id])
   erb :location
-end
-
-def invalid_location_guard(params)
-  journey = load_journey(params[:journey_id])
-  country = load_country(journey, params[:country_id])
-
-  id = params[:location_id].to_i
-  if country.locations.none? { |location| location.id == id }
-    session[:message] = "The location specified doesn't exist."
-    redirect "/journeys/#{journey.id}/countries/#{country.id}"
-  end
 end
 
 def load_location(country, id)
