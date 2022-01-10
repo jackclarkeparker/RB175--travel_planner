@@ -15,14 +15,14 @@
 <% end %>
 <% if @journey.details && @journey.details.size > 0 %>
   <h2>Details</h2>
-  <p><%= @journey.details %>
+  <p><%== @journey.rendered_details %>
 <% end %>
 <% if @journey.pros && @journey.pros.size > 0 %>
   <h2>Pros</h2>
-  <p><%= @journey.pros %></p>
+  <p><%= @journey.rendered_pros %></p>
 <% end %>
 <% if @journey.cons && @journey.cons.size > 0 %>
   <h2>Cons</h2>
-  <p><%= @journey.cons %></p>
+  <p><%= @journey.rendered_cons %></p>
 <% end %>
 <p><a href="/journeys/<%= @journey.id %>/add_details">Add details</a></p>

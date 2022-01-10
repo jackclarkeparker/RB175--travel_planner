@@ -22,6 +22,25 @@ countries:
     cons:
   visa:
   length_of_stay:
-details: Merry Go Round. Write Code. Get into the world.
-pros: It's great to go to Infinity.
-cons: There is nothing beyond infinity. What's with this conceptualization.?
+- !ruby/object:Country
+  name: Australia
+  id: 2
+  locations:
+  - !ruby/object:Location
+    name: Sydney
+    id: 1
+    temporable_details:
+      :arrival_date: 14-11-2022
+      :departure_date:
+    departure_ticket:
+    accomodations: []
+    activities: []
+    photos: []
+    details:
+    pros:
+    cons:
+  visa:
+  length_of_stay:
+details: ''
+pros: ''
+cons: ''

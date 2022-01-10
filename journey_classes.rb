@@ -1,4 +1,5 @@
 require 'date'
+require 'redcarpet'
 
 module Temporable
   def set_arrival_date(d)
@@ -35,6 +36,13 @@ module Temporable
 end
 
 module Detailable
+  attr_reader :details, :pros, :cons
+
+  def markdown_to_html(content)
+    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
+    markdown.render(content)
+  end
+
   def set_details(d)
     self.details = d
   end
@@ -45,6 +53,18 @@ module Detailable
 
   def set_cons(c)
     self.cons = c
+  end
+
+  def rendered_details
+    markdown_to_html(@details)
+  end
+
+  def rendered_pros
+    markdown_to_html(@pros)
+  end
+
+  def rendered_cons
+    markdown_to_html(@cons)
   end
 end
 
@@ -77,7 +97,7 @@ end
 class Journey
   include Detailable
 
-  attr_reader :name, :camel_case_name, :id, :countries, :details, :pros, :cons
+  attr_reader :name, :camel_case_name, :id, :countries
 
   def initialize(name)
     @name = name
@@ -123,7 +143,7 @@ end
 class Country
   include Detailable
 
-  attr_reader :name, :id, :locations, :visa, :details, :pros, :cons
+  attr_reader :name, :id, :locations, :visa
 
   def initialize(name, id)
     @name = name
@@ -165,7 +185,6 @@ class Location
 
   attr_reader :name, :id, :temporable_details, :departure_ticket # Could store these as a range
   attr_reader :activities, :accomodations, :photos
-  attr_reader :details, :pros, :cons
 
   def initialize(name, id)
     @name = name
@@ -224,9 +243,8 @@ end
 class Activity
   include Temporable, Addressable, Costable, Detailable
 
-  attr_reader :name, :id, :cost, :details, :pros, :cons
+  attr_reader :name, :id, :cost, :to_bring
   attr_reader :temporable_details, :addressable_details
-  attr_reader :to_bring
 
   def initialize(name, id)
     @name = name
@@ -259,8 +277,8 @@ end
 class Accomodation # Too ambiguous? Sometimes we'll stay in a temporary accomodation, othertimes we'll rent an apartment
   include Temporable, Addressable, Costable, Detailable
 
-  attr_reader :name, :id, :cost, :details, :pros, :cons
-  attr_reader :address, :temporable_details, :booking_service
+  attr_reader :name, :id, :cost, :address
+  attr_reader :temporable_details, :booking_service
 
   def initialize(name, id)
     @name = name
@@ -294,8 +312,7 @@ class DepartureTicket
 
   attr_reader :transport_mode, :departure_time, :arrival_time
   attr_reader :departure_address, :arrival_address, :transport_provider
-  attr_reader :ticket_number, :path_to_file
-  attr_reader :cost, :details, :pros, :cons
+  attr_reader :ticket_number, :path_to_file, :cost
 
   def initialize
     @transport_mode = nil
@@ -337,8 +354,8 @@ end
 class Visa
   include Temporable, PathToFile, Costable, Detailable
 
-  attr_reader :type, :number, :entry_date, :exit_date, :path_to_file
-  attr_reader :cost, :details, :pros, :cons
+  attr_reader :type, :number, :entry_date, :exit_date
+  attr_reader :path_to_file, :cost
 
   def initialize
     @type = nil
