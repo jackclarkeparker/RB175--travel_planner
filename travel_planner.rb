@@ -30,7 +30,7 @@ helpers do
   def navigation_breadcrumb_names(route)
     instances = []
     ids = route.scan(/\d+/)
-    ids = ids[0..-2] unless route.include?('add_')
+    ids.pop unless route.include?('add_')
 
     instances << journey = load_journey(ids.shift) unless ids.empty?
     instances << country = load_country(journey, ids.shift) unless ids.empty?
@@ -95,16 +95,6 @@ post "/create_journey" do
   end
 end
 
-def create_journey(journey_name)
-  journey = Journey.new(journey_name)
-  save_journey(journey)
-end
-
-def save_journey(journey)
-  journey_path = File.join(data_path, "#{journey.camel_case_name}.yml")
-  File.write(journey_path, Psych.dump(journey))
-end
-
 def invalid_journey_name?(input_name)
   input_name.empty? ||
   invalid_name_chars?(input_name) ||
@@ -133,24 +123,33 @@ def message_for_invalid_journey_name(name)
   end
 end
 
+def create_journey(journey_name)
+  journey = Journey.new(journey_name)
+  save_journey(journey)
+end
+
+def save_journey(journey)
+  journey_path = File.join(data_path, "#{journey.camel_case_name}.yml")
+  File.write(journey_path, Psych.dump(journey))
+end
+
 get "/journeys/:journey_id" do
-  if nonexistent_journey?(params[:journey_id])
-    session[:message] = "That journey doesn't exist"
+  invalid_journey_guard(params)
+  @journey = load_journey(params[:journey_id])
+  render_page_with_details(@journey, :journey)
+end
+
+def invalid_journey_guard(params)
+  id = params[:journey_id].to_i
+  if load_journeys.none? { |journey| journey.id == id }
+    session[:message] = "The journey specified doesn't exist."
     redirect "/"
-  else
-    @journey = load_journey(params[:journey_id])
-    render_page_with_details(@journey, :journey)
   end
 end
 
 def load_journey(id)
   id = id.to_i
   load_journeys.find { |journey| journey.id == id }
-end
-
-def nonexistent_journey?(id)
-  id = id.to_i
-  load_journeys.none? { |journey| journey.id == id }
 end
 
 def render_page_with_details(subject, template)
@@ -161,6 +160,7 @@ def render_page_with_details(subject, template)
 end
 
 get "/journeys/:journey_id/add_country" do
+  invalid_journey_guard(params)
   @journey = load_journey(params[:journey_id])
   erb :add_country
 end
@@ -225,6 +225,8 @@ def message_for_invalid_new_country(inputs)
 end
 
 get "/journeys/:journey_id/add_details" do
+  invalid_journey_guard(params)
+
   @journey = load_journey(params[:journey_id])
   @subject = @journey
   erb :add_details
@@ -242,10 +244,22 @@ post "/journeys/:journey_id/add_details" do
 end
 
 get "/journeys/:journey_id/countries/:country_id" do
+  invalid_journey_guard(params)
+  invalid_country_guard(params)
+
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])
 
   erb :country
+end
+
+def invalid_country_guard(params)
+  journey = load_journey(params[:journey_id])
+  id = params[:country_id].to_i
+  if journey.countries.none? { |country| country.id == id }
+    session[:message] = "The country specified doesn't exist."
+    redirect "/journeys/#{journey.id}"
+  end
 end
 
 def load_country(journey, id)
@@ -254,6 +268,9 @@ def load_country(journey, id)
 end
 
 get "/journeys/:journey_id/countries/:country_id/add_location" do
+  invalid_journey_guard(params)
+  invalid_country_guard(params)
+
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])
   
@@ -265,7 +282,6 @@ post "/journeys/:journey_id/countries/:country_id/add_location" do
   @country = load_country(@journey, params[:country_id])
 
   params.each_value(&:strip!)
-  # binding.pry
   @location = params[:location]
   @arrival_date = params[:arrival_date]
 
@@ -297,10 +313,25 @@ def message_for_invalid_new_location(inputs)
 end
 
 get "/journeys/:journey_id/countries/:country_id/locations/:location_id" do
+  invalid_journey_guard(params)
+  invalid_country_guard(params)
+  invalid_location_guard(params)
+
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])
   @location = load_location(@country, params[:location_id])
   erb :location
+end
+
+def invalid_location_guard(params)
+  journey = load_journey(params[:journey_id])
+  country = load_country(journey, params[:country_id])
+
+  id = params[:location_id].to_i
+  if country.locations.none? { |location| location.id == id }
+    session[:message] = "The location specified doesn't exist."
+    redirect "/journeys/#{journey.id}/countries/#{country.id}"
+  end
 end
 
 def load_location(country, id)
