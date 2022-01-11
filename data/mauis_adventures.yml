@@ -1,17 +1,17 @@
 --- !ruby/object:Journey
-name: To infinity and beyond
-camel_case_name: to_infinity_and_beyond
+name: Mauis Adventures
+camel_case_name: mauis_adventures
 id: 1
 countries:
 - !ruby/object:Country
-  name: New Zealand
+  name: Norway
   id: 1
   locations:
   - !ruby/object:Location
-    name: Wellington
+    name: Oslo
     id: 1
     temporable_details:
-      :arrival_date: 13-11-2022
+      :arrival_date: 05-12-2023
       :departure_date:
     departure_ticket:
     accomodations: []

@@ -354,27 +354,34 @@ end
 post "/journeys/:journey_id/countries/:country_id/locations/:location_id/add_accomodation" do
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])
-  @location = load_location(@coutnry, params[:location_id])
+  @location = load_location(@country, params[:location_id])
 
   params.each_value(&:strip!)
   # @accomodation_name = params[:name]
   # @arrival_date = params[:arrival_date]
 
-  if invalid_new_accomodation?(params)
-    status 422
-    session[:message] = message_for_invalid_new_accomodation(params)
-    erb :add_accomodation
-  else
+  # if invalid_new_accomodation?(params)
+  #   status 422
+  #   session[:message] = message_for_invalid_new_accomodation(params)
+  #   erb :add_accomodation
+  # else
     add_accomodation(@journey, @country, @location, params)
     
     session[:message] = "Travels in #{@country.name} now include time spent in #{@location}!"
     redirect parent_route
-  end
+  # end
 end
 
 def add_accomodation(journey, country, location, params)
   added_acc = location.add_accomodation(params[:name])
-  added_acc.set_arrival_date(arrival_date)
+  added_acc.set_address(params[:address])
+  added_acc.set_cost(params[:cost])
+  added_acc.set_arrival_date(params[:starting_date])
+  added_acc.set_departure_date(params[:ending_date]) if params[:ending_date]
+  added_acc.set_check_in_time(params[:check_in_time])
+  added_acc.set_check_out_time(params[:check_out_time])
+  added_acc.set_booking_service(params[:booking_service])
+  added_acc.set_rating(params[:rating])
 
   save_journey(journey)  
 end
@@ -390,4 +397,21 @@ end
 
 post "/journeys/:journey_id/countries/:country_id/locations/:location_id/add_activity" do
 
+end
+
+def add_activity(journey, country, location, params)
+  added_act = location.add_activity(params[:name])
+  added_act.set_starting_address(params[:starting_address])
+  added_act.set_ending_address(params[:ending_address]) if params[:ending_address]
+  added_act.set_starting_date(params[:starting_date])
+  added_act.set_ending_date(params[:ending_date]) if params[:ending_date]
+  
+  added_act.set_cost(params[:cost])
+
+  added_act.set_starting_time(params[:starting_time])
+  added_act.set_ending_time(params[:ending_time])
+  added_act.set_rating(params[:rating])
+  added_act.set_to_bring(params[:to_bring])
+
+  save_journey(journey)  
 end

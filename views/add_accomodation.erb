@@ -12,28 +12,32 @@
   </div>
   <div>
     <label for="cost">How much will it cost to stay there?
-      Can be provided as a total ($$$), or a nightly rate ($$/night)
       <input name="cost" value="<%= @cost %>">
+      <span class="note">Can be provided as a total (xxx), or a nightly rate (xx/night)</span>
     </label>
   </div>
   <div>
-    <label for="arrival_date">What date will you arrive? (dd-mm-yyyy)
+    <label for="arrival_date">What date will you arrive?
       <input name="arrival_date" value="<%= @arrival_date %>">
+      <span class="note">(dd-mm-yyyy)</span>
     </label>
   </div>
   <div>
-    <label for="check_in">From what time can you check-in?
-      <input name="check_in" value="<%= @check_in %>">
-    </label>
-  </div>
-  <div>
-    <label for="departure_date">What date will you leave? (dd-mm-yyyy)
+    <label for="departure_date">What date will you leave?
       <input name="departure_date" value="<%= @departure_date %>">
+      <span class="note">(dd-mm-yyyy)</span>
     </label>
   </div>
   <div>
-    <label for="check_out">By what time do you need to check-out?
-      <input name="check_out" value="<%= @check_out %>">
+    <label for="check_in_time">From what time can you check-in?
+      <input name="check_in_time" value="<%= @check_in_time %>">
+      <span class="note">(24-hour time, e.g. 17:00)</span>
+    </label>
+  </div>
+  <div>
+    <label for="check_out_time">By what time do you need to check-out?
+      <input name="check_out_time" value="<%= @check_out_time %>">
+      <span class="note">(24-hour time, e.g. 17:00)</span>
     </label>
   </div>
   <div>

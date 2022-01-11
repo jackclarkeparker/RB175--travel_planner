@@ -8,6 +8,7 @@
   <div>
     <label for="cost">How much will it cost?
       <input name="cost" value="<%= @cost %>">
+      <span class="note"></span>
     </label>
   </div>
   <div>
@@ -16,33 +17,39 @@
     </label>
   </div>
   <div>
-    <label for="ending_address">At which address will you finish? (Only supply if different from starting address)
+    <label for="ending_address">At which address will you finish?
       <input name="ending_address" value="<%= @ending_address %>">
+      <span class="note">(Only supply if differs from starting address)</span>
     </label>
   </div>
   <div>
-    <label for="starting_date">What date will you start out? (dd-mm-yyyy)
+    <label for="starting_date">What date will you start out?
       <input name="starting_date" value="<%= @starting_date %>">
+      <span class="note">(dd-mm-yyyy)</span>
     </label>
   </div>
   <div>
-    <label for="ending_date">What date will you finish? (dd-mm-yyyy, only supply if different from starting date)
+    <label for="ending_date">What date will you finish?
       <input name="ending_date" value="<%= @ending_date %>">
+      <span class="note">(dd-mm-yyyy, only supply if differs from starting date)</span>
     </label>
   </div>
   <div>
     <label for="starting_time">What time will you begin?
       <input name="starting_time" value="<%= @starting_time %>">
+      <span class="note">(24-hour time, e.g. 17:00)</span>
     </label>
   </div>
   <div>
     <label for="finishing_time">What time will you finish?
       <input name="finishing_time" value="<%= @finishing_time %>">
+      <span class="note">(24-hour time, e.g. 17:00)</span>
     </label>
   </div>
   <div>
-    <label for="items_to_bring">Are there any items you should bring?
-      <input name="items_to_bring" value="<%= @items_to_bring %>">
+    <label for="to_bring">Are there any items you should bring?
+      <input name="to_bring" value="<%= @to_bring %>">
+      <span class="note">(comma delimit separate items, e.g. "item 1, item 2, item 3")</span>
     </label>
   </div>
   <div>

@@ -12,12 +12,20 @@ module Temporable
     temporable_details[:departure_date] = d
   end
 
-  def set_departure_time(time)
-    temporable_details[:departure_time] = time
+  def set_entry_date(d)
+    temporable_details[:entry_date] = d
+  end
+
+  def set_exit_date(d)
+    temporable_details[:exit_date] = d
   end
 
   def set_arrival_time(time)
     temporable_details[:arrival_time] = time
+  end
+
+  def set_departure_time(time)
+    temporable_details[:departure_time] = time
   end
 
   def set_starting_time(t)
@@ -224,11 +232,15 @@ class Location
   end
 
   def add_accomodation(name) # Use hash with acc key instead?
-    accomodations << Accomodation.new(name, new_accomodation_id)
+    a = Accomodation.new(name, new_accomodation_id)
+    accomodations << a
+    a
   end
 
   def add_activity(name) # Use hash with acc key instead?
-    activities << Activity.new(name, new_activity_id)
+    a = Activity.new(name, new_activity_id)
+    activities << a
+    a
   end
 
   def set_departure_ticket
@@ -278,8 +290,8 @@ class Activity
     @to_bring = []
   end
 
-  def add_item_to_bring(item)
-    to_bring << item
+  def set_to_bring(items)
+    to_bring << items
   end
 end
 
@@ -361,14 +373,12 @@ end
 class Visa
   include Temporable, PathToFile, Costable, Detailable
 
-  attr_reader :type, :number, :entry_date, :exit_date
-  attr_reader :path_to_file
+  attr_reader :type, :number, :path_to_file
 
   def initialize
     @type = nil
     @number = nil
-    @entry_date = nil
-    @exit_date = nil
+    @temporable_details = { entry_date: nil, exit_date: nil }
     @information = nil
     @path_to_file = nil
   end
@@ -387,5 +397,5 @@ class Visa
 
   private
 
-  attr_writer :type, :number, :entry_date, :exit_date, :path_to_file
+  attr_writer :type, :number, :path_to_file
 end
