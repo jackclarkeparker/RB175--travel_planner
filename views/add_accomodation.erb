@@ -1,0 +1,50 @@
+<h2>Adding accomodation in <%= @location.name %>...</h2>
+<form action='/journeys/<%= @journey.id %>/countries/<%= @country.id %>/locations/<%= @location.id %>/add_accomodation' method="post">
+  <div>    
+    <label for="name">What's the name of the accomodation you'd like to stay at?
+      <input name="name" value="<%= @name %>">
+    </label>
+  </div>
+  <div>
+    <label for="address">What is the address?
+      <input name="address" value="<%= @address %>">
+    </label>
+  </div>
+  <div>
+    <label for="cost">How much will it cost to stay there?
+      Can be provided as a total ($$$), or a nightly rate ($$/night)
+      <input name="cost" value="<%= @cost %>">
+    </label>
+  </div>
+  <div>
+    <label for="arrival_date">What date will you arrive? (dd-mm-yyyy)
+      <input name="arrival_date" value="<%= @arrival_date %>">
+    </label>
+  </div>
+  <div>
+    <label for="check_in">From what time can you check-in?
+      <input name="check_in" value="<%= @check_in %>">
+    </label>
+  </div>
+  <div>
+    <label for="departure_date">What date will you leave? (dd-mm-yyyy)
+      <input name="departure_date" value="<%= @departure_date %>">
+    </label>
+  </div>
+  <div>
+    <label for="check_out">By what time do you need to check-out?
+      <input name="check_out" value="<%= @check_out %>">
+    </label>
+  </div>
+  <div>
+    <label for="booking_service">Who did you book with?
+      <input name="booking_service" value="<%= @booking_service %>">
+    </label>
+  </div>
+  <div>
+    <label for="rating">What's the rating?
+      <input name="rating" value="<%= @rating %>">
+    </label>
+  </div>
+  <button type="submit">Add Accomodation</button>
+</form>

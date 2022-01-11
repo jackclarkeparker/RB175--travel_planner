@@ -3,9 +3,10 @@
 <h2>Accomodations</h2>
 <ul>
   <% @location.accomodations.each do |accomodation| %>
-    <li><a href="/journeys/<%= @journey.id %>/countries/<%= @country.id %>/locations/<%= location.id %>/accomodations/<%= accomodation.id %>"><%= accomodation.name %></a></li>
+    <li><a href="/journeys/<%= @journey.id %>/countries/<%= @country.id %>/locations/<%= @location.id %>/accomodations/<%= accomodation.id %>"><%= accomodation.name %></a></li>
   <% end %>
 </ul>
+<p><a href="/journeys/<%= @journey.id %>/countries/<%= @country.id %>/locations/<%= @location.id %>/add_accomodation">Add accomodation?</a></p>
 
 <h2>Activities</h2>
 <ul>
@@ -13,3 +14,4 @@
     <li><a href="/journeys/<%= @journey.id %>/countries/<%= @country.id %>/locations/<%= location.id %>/activities/<%= activity.id %>"><%= activity.name %></a></li>
   <% end %>
 </ul>
+<p><a href="/journeys/<%= @journey.id %>/countries/<%= @country.id %>/locations/<%= @location.id %>/add_activity">Add activity?</a></p>

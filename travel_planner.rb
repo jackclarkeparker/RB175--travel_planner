@@ -341,3 +341,53 @@ def load_location(country, id)
   id = id.to_i
   country.locations.find { |l| l.id == id}
 end
+
+get "/journeys/:journey_id/countries/:country_id/locations/:location_id/add_accomodation" do
+  invalid_route_guard(params)
+
+  @journey = load_journey(params[:journey_id])
+  @country = load_country(@journey, params[:country_id])
+  @location = load_location(@country, params[:location_id])
+  erb :add_accomodation
+end
+
+post "/journeys/:journey_id/countries/:country_id/locations/:location_id/add_accomodation" do
+  @journey = load_journey(params[:journey_id])
+  @country = load_country(@journey, params[:country_id])
+  @location = load_location(@coutnry, params[:location_id])
+
+  params.each_value(&:strip!)
+  # @accomodation_name = params[:name]
+  # @arrival_date = params[:arrival_date]
+
+  if invalid_new_accomodation?(params)
+    status 422
+    session[:message] = message_for_invalid_new_accomodation(params)
+    erb :add_accomodation
+  else
+    add_accomodation(@journey, @country, @location, params)
+    
+    session[:message] = "Travels in #{@country.name} now include time spent in #{@location}!"
+    redirect parent_route
+  end
+end
+
+def add_accomodation(journey, country, location, params)
+  added_acc = location.add_accomodation(params[:name])
+  added_acc.set_arrival_date(arrival_date)
+
+  save_journey(journey)  
+end
+
+get "/journeys/:journey_id/countries/:country_id/locations/:location_id/add_activity" do
+  invalid_route_guard(params)
+
+  @journey = load_journey(params[:journey_id])
+  @country = load_country(@journey, params[:country_id])
+  @location = load_location(@country, params[:location_id])
+  erb :add_activity
+end
+
+post "/journeys/:journey_id/countries/:country_id/locations/:location_id/add_activity" do
+
+end

@@ -2,6 +2,8 @@ require 'date'
 require 'redcarpet'
 
 module Temporable
+  attr_reader :temporable_details
+
   def set_arrival_date(d)
     temporable_details[:arrival_date] = d
   end
@@ -33,6 +35,10 @@ module Temporable
   def set_check_out_time(time)
     temporable_details[:check_out_time] = time
   end
+
+  private
+
+  attr_writer :temporable_details
 end
 
 module Detailable
@@ -66,9 +72,15 @@ module Detailable
   def rendered_cons
     markdown_to_html(@cons)
   end
+
+  private
+
+  attr_writer :details, :pros, :cons
 end
 
 module Addressable
+  attr_reader :addressable_details
+
   def set_arrival_address(address)
     addressable_details[:arrival_address] = address
   end
@@ -80,12 +92,26 @@ module Addressable
   def set_address(a)
     addressable_details[:address] = a
   end
+
+  private
+
+  attr_writer :addressable_details
 end
 
 module Costable
+  attr_reader :cost, :rating
+
   def set_cost(c)
     self.cost = c
   end
+
+  def set_rating(r)
+    self.rating = r
+  end
+
+  private
+
+  attr_writer :cost, :rating
 end
 
 module PathToFile
@@ -136,8 +162,6 @@ class Journey
       id += 1
     end
   end
-
-  attr_writer :details, :pros, :cons
 end
 
 class Country
@@ -177,13 +201,13 @@ class Country
     end
   end
 
-  attr_writer :visa, :details, :pros, :cons
+  attr_writer :visa
 end
 
 class Location
   include Temporable, Detailable
 
-  attr_reader :name, :id, :temporable_details, :departure_ticket # Could store these as a range
+  attr_reader :name, :id, :departure_ticket # Could store these as a range
   attr_reader :activities, :accomodations, :photos
 
   def initialize(name, id)
@@ -197,10 +221,6 @@ class Location
     @details = nil
     @pros = nil
     @cons = nil
-  end
-
-  def set_arrival_date(date)
-    temporable_details[:arrival_date] = date
   end
 
   def add_accomodation(name) # Use hash with acc key instead?
@@ -237,19 +257,20 @@ class Location
     end
   end
 
-  attr_writer :details, :pros, :cons, :departure_ticket
+  attr_writer :departure_ticket
 end
 
 class Activity
   include Temporable, Addressable, Costable, Detailable
 
-  attr_reader :name, :id, :cost, :to_bring
-  attr_reader :temporable_details, :addressable_details
+  attr_reader :name, :id, :to_bring
+  attr_reader :addressable_details
 
   def initialize(name, id)
     @name = name
     @id = id
     @cost = nil
+    @rating = nil
     @pros = nil
     @cons = nil
     @temporable_details = { starting_time: nil, ending_time: nil }
@@ -257,33 +278,22 @@ class Activity
     @to_bring = []
   end
 
-  def set_pros(p)
-    self.pros = p
-  end
-
-  def set_cons(c)
-    self.cons = c
-  end
-
   def add_item_to_bring(item)
     to_bring << item
   end
-
-  private 
-
-  attr_writer :cost, :details, :pros, :cons
 end
 
 class Accomodation # Too ambiguous? Sometimes we'll stay in a temporary accomodation, othertimes we'll rent an apartment
   include Temporable, Addressable, Costable, Detailable
 
-  attr_reader :name, :id, :cost, :address
-  attr_reader :temporable_details, :booking_service
+  attr_reader :name, :id, :address
+  attr_reader :booking_service
 
   def initialize(name, id)
     @name = name
     @id = id
     @cost = nil
+    @rating = nil
     @details = nil
     @pros = nil
     @cons = nil
@@ -303,16 +313,14 @@ class Accomodation # Too ambiguous? Sometimes we'll stay in a temporary accomoda
 
   private
 
-  attr_writer :name, :cost, :details, :pros, :cons
-  attr_writer :address, :booking_service
+  attr_writer :name, :address, :booking_service
 end
 
 class DepartureTicket
-  include Temporable, Addressable, PathToFile, Detailable
+  include Temporable, Addressable, PathToFile, Detailable, Costable
 
-  attr_reader :transport_mode, :departure_time, :arrival_time
-  attr_reader :departure_address, :arrival_address, :transport_provider
-  attr_reader :ticket_number, :path_to_file, :cost
+  attr_reader :transport_mode, :transport_provider
+  attr_reader :ticket_number, :path_to_file
 
   def initialize
     @transport_mode = nil
@@ -322,6 +330,7 @@ class DepartureTicket
     @ticket_number = nil
     @path_to_file = nil
     @cost = nil
+    @rating = nil
     @details = nil
     @pros = nil
     @cons = nil
@@ -345,17 +354,15 @@ class DepartureTicket
 
   private
 
-  attr_writer :transport_mode, :departure_time, :arrival_time
-  attr_writer :departure_address, :arrival_address, :transport_provider
+  attr_writer :transport_mode, :transport_provider
   attr_writer :ticket_number, :path_to_file
-  attr_writer :cost, :details, :pros, :cons
 end
 
 class Visa
   include Temporable, PathToFile, Costable, Detailable
 
   attr_reader :type, :number, :entry_date, :exit_date
-  attr_reader :path_to_file, :cost
+  attr_reader :path_to_file
 
   def initialize
     @type = nil
@@ -381,5 +388,4 @@ class Visa
   private
 
   attr_writer :type, :number, :entry_date, :exit_date, :path_to_file
-  attr_writer :cost, :details, :pros, :cons
 end

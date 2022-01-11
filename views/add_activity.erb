@@ -1,0 +1,54 @@
+<h2>Adding an activity in <%= @location.name %>...</h2>
+<form action='/journeys/<%= @journey.id %>/countries/<%= @country.id %>/locations/<%= @location.id %>/add_activity' method="post">
+  <div>    
+    <label for="name">What's the name of the activity?
+      <input name="name" value="<%= @name %>">
+    </label>
+  </div>
+  <div>
+    <label for="cost">How much will it cost?
+      <input name="cost" value="<%= @cost %>">
+    </label>
+  </div>
+  <div>
+    <label for="starting_address">From what address do you start?
+      <input name="starting_address" value="<%= @starting_address %>">
+    </label>
+  </div>
+  <div>
+    <label for="ending_address">At which address will you finish? (Only supply if different from starting address)
+      <input name="ending_address" value="<%= @ending_address %>">
+    </label>
+  </div>
+  <div>
+    <label for="starting_date">What date will you start out? (dd-mm-yyyy)
+      <input name="starting_date" value="<%= @starting_date %>">
+    </label>
+  </div>
+  <div>
+    <label for="ending_date">What date will you finish? (dd-mm-yyyy, only supply if different from starting date)
+      <input name="ending_date" value="<%= @ending_date %>">
+    </label>
+  </div>
+  <div>
+    <label for="starting_time">What time will you begin?
+      <input name="starting_time" value="<%= @starting_time %>">
+    </label>
+  </div>
+  <div>
+    <label for="finishing_time">What time will you finish?
+      <input name="finishing_time" value="<%= @finishing_time %>">
+    </label>
+  </div>
+  <div>
+    <label for="items_to_bring">Are there any items you should bring?
+      <input name="items_to_bring" value="<%= @items_to_bring %>">
+    </label>
+  </div>
+  <div>
+    <label for="rating">What's the rating?
+      <input name="rating" value="<%= @rating %>">
+    </label>
+  </div>
+  <button type="submit">Add Activity</button>
+</form>

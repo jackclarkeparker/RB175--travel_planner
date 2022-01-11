@@ -22,27 +22,6 @@ countries:
     cons:
   visa:
   length_of_stay:
-- !ruby/object:Country
-  name: Australia
-  id: 2
-  locations:
-  - !ruby/object:Location
-    name: Sydney
-    id: 1
-    temporable_details:
-      :arrival_date: 14-11-2022
-      :departure_date:
-    departure_ticket:
-    accomodations: []
-    activities: []
-    photos: []
-    details:
-    pros:
-    cons:
-  visa:
-  length_of_stay:
-details: We're going to have a catch up soon.
-pros: "- See Trân for the first time in years\r\n- Study together for a time\r\n-
-  Be overseas, away from family\r\n- Experience a different culture (Jack-Centric)\r\n-
-  Get Kiki out of the toxic environment she is inhabiting (Kiki-Centric)"
-cons: "- Costs Money\r\n- Being overseas during unstable times"
+details:
+pros:
+cons:
