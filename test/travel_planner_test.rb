@@ -77,7 +77,7 @@ class TravelPlannerTest < Minitest::Test
     refute_includes last_response.body, %q(<a href="/journeys/1">Foo Vacation</a>)
   end
 
-  def test_create_journey # <<< Test with whitespace -> "foo vacation"
+  def test_create_journey
     post "/create_journey", { journey_name: "Foo Vacation" }
 
     assert_equal 302, last_response.status
@@ -138,13 +138,9 @@ class TravelPlannerTest < Minitest::Test
     assert_includes last_response.body, %q(<a href="/journeys/1/countries/1">New Zealand)
   end
 
-  def test_breadcrumb_navigation_at_journey_page
-    create_journey "Foo Vacation"
-    get "/journeys/1"
+  # def test_visit_journey_page_with_details
 
-    assert_includes last_response.body, %q(<a href="/">Home</a>)
-    refute_includes last_response.body, %q(<a href="/journeys/1">Foo Vacation</a>)
-  end
+  # end
 
   def test_id_increments_with_multiple_countries
     create_journey('Foo Vacation')
@@ -161,16 +157,24 @@ class TravelPlannerTest < Minitest::Test
     assert_includes last_response.body, %q(<a href="/journeys/1/countries/3">Vietnam)
   end
 
-  def test_visit_non_existent_journey_page
+  def test_visit_nonexistent_journey_page
     get '/journeys/1'
 
     assert_equal 302, last_response.status
-    assert_equal "That journey doesn't exist", session[:message]
+    assert_equal "The journey specified doesn't exist.", session[:message]
     
     get last_response["Location"]
 
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<p>It looks like you haven't got any journeys planned right now..."
+  end
+
+  def test_breadcrumb_navigation_at_journey_page
+    create_journey "Foo Vacation"
+    get "/journeys/1"
+
+    assert_includes last_response.body, %q(<a href="/">Home</a>)
+    refute_includes last_response.body, %q(<a href="/journeys/1">Foo Vacation</a>)
   end
 
   def test_visit_add_country_page_first_country
@@ -197,6 +201,18 @@ class TravelPlannerTest < Minitest::Test
     assert_includes last_response.body, %q(<label for="country">Which country would you like to add to your journey?)
     assert_includes last_response.body, %q(<label for="location">Which location will you arrive in?)
     assert_includes last_response.body, %q(<label for="arrival_date">What date will you arrive? (dd-mm-yyyy))
+  end
+
+  def test_visit_add_country_page_for_nonexistent_journey
+    get '/journeys/1/add_country'
+
+    assert_equal 302, last_response.status
+    assert_equal "The journey specified doesn't exist.", session[:message]
+    
+    get last_response["Location"]
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<p>It looks like you haven't got any journeys planned right now..."
   end
 
   def test_breadcrumb_navigation_at_add_country_page
@@ -253,6 +269,18 @@ class TravelPlannerTest < Minitest::Test
     assert_includes last_response.body, %q(<input name="arrival_date" value="0001-10-24">)
   end
 
+  # def test_visit_add_details_page_for_journey_sans_details
+
+  # end
+
+  # def test_visit_add_details_page_for_journey_with_details
+
+  # end
+
+  # def test_breadcrumb_navigation_at_add_details_page_for_journey
+
+  # end
+
   def test_visit_country_page
     create_journey('Foo Vacation')
     add_country_for_tests("Foo Vacation", "New Zealand", "Wellington", "13-11-2022")
@@ -262,6 +290,19 @@ class TravelPlannerTest < Minitest::Test
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<h2>Locations</h2>"
     assert_includes last_response.body, %q(<li><a href="/journeys/1/countries/1/locations/1">Wellington)
+  end
+
+  def test_visit_nonexistent_country_page
+    create_journey("Foo Vacation")
+    get '/journeys/1/countries/1'
+
+    assert_equal 302, last_response.status
+    assert_equal "The country specified doesn't exist.", session[:message]
+    
+    get last_response["Location"]
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<p>It looks like you don't have any countries planned for a visit on this journey yet."
   end
 
   def test_breadcrumb_navigation_at_country_page
@@ -285,6 +326,19 @@ class TravelPlannerTest < Minitest::Test
     assert_includes last_response.body, "<h2>Adding a Location..."
     assert_includes last_response.body, %q(<label for="location">Where else would you like to visit during your time in New Zealand?)
     assert_includes last_response.body, %q(<label for="arrival_date">What date will you arrive there? (dd-mm-yyyy))
+  end
+
+  def test_visit_add_location_page_for_nonexistent_country
+    create_journey("Foo Vacation")
+    get '/journeys/1/countries/1/add_location'
+
+    assert_equal 302, last_response.status
+    assert_equal "The country specified doesn't exist.", session[:message]
+    
+    get last_response["Location"]
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<p>It looks like you don't have any countries planned for a visit on this journey yet."
   end
 
   def test_breadcrumb_navigation_at_add_location_page
@@ -335,5 +389,59 @@ class TravelPlannerTest < Minitest::Test
     assert_includes last_response.body, "Invalid date: Please be sure to follow the specified format: <b>dd-mm-yyyy</b>"
     assert_includes last_response.body, %q(<input name="location" value="Auckland">)
     assert_includes last_response.body, %q(<input name="arrival_date" value="0001-01-30">)
+  end
+
+  def test_id_increments_with_multiple_locations
+    create_journey('Foo Vacation')
+    add_country_for_tests('Foo Vacation', 'New Zealand', 'Wellington', '13-11-1864')
+    post "/journeys/1/countries/1/add_location", { location: 'Ohakune', arrival_date: '14-11-1864' }
+    post "/journeys/1/countries/1/add_location", { location: 'Auckland', arrival_date: '15-11-1864' }
+
+    get "/journeys/1/countries/1"
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<h2>Locations</h2>"
+    assert_includes last_response.body, %q(<a href="/journeys/1/countries/1/locations/1">Wellington)
+    assert_includes last_response.body, %q(<a href="/journeys/1/countries/1/locations/2">Ohakune)
+    assert_includes last_response.body, %q(<a href="/journeys/1/countries/1/locations/3">Auckland)
+  end
+
+  def test_visit_location_page
+    create_journey('Foo Vacation')
+    add_country_for_tests('Foo Vacation', 'New Zealand', 'Wellington', '13-11-1864')
+
+    get "/journeys/1/countries/1/locations/1"
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<h1>Wellington</h1>"
+    assert_includes last_response.body, "<h2>Accomodations</h2>"
+    assert_includes last_response.body, "<h2>Activities</h2>"
+    assert_includes last_response.body, %q(<a href="1/add_details">Add details</a>)
+  end
+
+  def test_visit_nonexistent_location_page
+    create_journey("Foo Vacation")
+    add_country_for_tests('Foo Vacation', 'New Zealand', 'Wellington', '13-11-1864')
+
+    get '/journeys/1/countries/1/locations/2'
+
+    assert_equal 302, last_response.status
+    assert_equal "The location specified doesn't exist.", session[:message]
+    
+    get last_response["Location"]
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<h1>New Zealand</h1>"
+  end
+
+  def test_breadcrumb_navigation_at_location_page
+    create_journey('Foo Vacation')
+    add_country_for_tests('Foo Vacation', 'New Zealand', 'Wellington', '13-11-1864')
+
+    get "/journeys/1/countries/1/locations/1"
+
+    assert_includes last_response.body, %q(<a href="/">Home</a>)
+    assert_includes last_response.body, %q(<a href="/journeys/1">Foo Vacation</a>)
+    assert_includes last_response.body, %q(<a href="/journeys/1/countries/1">New Zealand</a>)
   end
 end

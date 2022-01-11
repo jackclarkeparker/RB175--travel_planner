@@ -1,0 +1,27 @@
+--- !ruby/object:Journey
+name: Something
+camel_case_name: something
+id: 2
+countries:
+- !ruby/object:Country
+  name: New Zealand
+  id: 1
+  locations:
+  - !ruby/object:Location
+    name: Wellignton
+    id: 1
+    temporable_details:
+      :arrival_date: 13-11-1654
+      :departure_date:
+    departure_ticket:
+    accomodations: []
+    activities: []
+    photos: []
+    details:
+    pros:
+    cons:
+  visa:
+  length_of_stay:
+details:
+pros:
+cons:

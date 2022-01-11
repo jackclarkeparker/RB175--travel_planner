@@ -276,7 +276,7 @@ get "/journeys/:journey_id/countries/:country_id" do
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])
 
-  erb :country
+  render_page_with_details(@country, :country)
 end
 
 def load_country(journey, id)
@@ -334,7 +334,7 @@ get "/journeys/:journey_id/countries/:country_id/locations/:location_id" do
   @journey = load_journey(params[:journey_id])
   @country = load_country(@journey, params[:country_id])
   @location = load_location(@country, params[:location_id])
-  erb :location
+  render_page_with_details(@location, :location)
 end
 
 def load_location(country, id)
